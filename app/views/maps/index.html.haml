@@ -1,0 +1,51 @@
+%h1 Listing maps
+
+%table
+  %tr
+    %th Title
+    %th Latitude
+    %th Longitude
+    %th
+    %th
+    %th
+
+  - @maps.each do |map|
+    %tr
+      %td= map.title
+      %td= map.latitude
+      %td= map.longitude
+      %td= link_to 'Show', map
+      %td= link_to 'Edit', edit_map_path(map)
+      %td= link_to 'Destroy', map, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Map', new_map_path
+
+%div#map
+:css
+  #map { height: 700px; }
+:javascript
+  L.Icon.Default.imagePath = "/assets";
+  var lat = 35.65991663135068;
+  var lng = 139.76471178097805;
+  var map = L.map('map').setView([lat, lng], 15);
+  var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  var osmAttrib = "Map data © OpenStreetMap contributors";
+  L.tileLayer(osmUrl, {
+    attribution: osmAttrib,
+    maxZoom: 20,
+  }).addTo(map);
+  
+  $.ajax({
+    type: "GET",
+    url: "/maps.json",
+    dataType: "json",
+    success: function(maps) {
+      for(var i = 0; i < maps.length; i++) {
+        var m = maps[i];
+        var marker = L.marker([m.latitude, m.longitude]).addTo(map);
+        marker.bindPopup("<b>朝日新聞</b><br>契約済<br>契約数：2000<br>営業コメント：大口のお客様です！");
+      }
+    }
+  });
