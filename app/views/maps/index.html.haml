@@ -1,41 +1,46 @@
-%h1 Listing maps
-
-%table
-  %tr
-    %th Title
-    %th Latitude
-    %th Longitude
-    %th
-    %th
-    %th
-
-  - @maps.each do |map|
-    %tr
-      %td= map.title
-      %td= map.latitude
-      %td= map.longitude
-      %td= link_to 'Show', map
-      %td= link_to 'Edit', edit_map_path(map)
-      %td= link_to 'Destroy', map, :method => :delete, :data => { :confirm => 'Are you sure?' }
-
-%br
-
-= link_to 'New Map', new_map_path
-
 %div#map
+%div#search
+  %input{:type=>"text", :name => "addr", :placeholder => "住所、地名を入力してください", :id => "addr", :size => 10}
+  %button{:onclick => 'addr_search()'}検索
+
 :css
   #map { height: 700px; }
+  #search {
+  background-color: white;
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  width: auto;
+  height: auto;
+  padding: 10px;
+  }
+  #search input {
+  width: 200px;
+  }
+  
 :javascript
+  function addr_search() {
+    var inp = document.getElementById("addr");
+    alert('検索実行');
+  }
   L.Icon.Default.imagePath = "/assets";
   var lat = 35.65991663135068;
   var lng = 139.76471178097805;
   var map = L.map('map').setView([lat, lng], 15);
   var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   var osmAttrib = "Map data © OpenStreetMap contributors";
+  var redIcon = L.icon({
+    iconUrl: '/assets/leaf-red.png',
+    shadowUrl: '/assets/leaf-shadow.png',
+    iconSize:     [38, 95],
+    shadowSize:   [50, 64]
+  });
   L.tileLayer(osmUrl, {
     attribution: osmAttrib,
-    maxZoom: 20,
+    maxZoom: 18
   }).addTo(map);
+  
+  L.circle([lat, lng], 500).addTo(map);
   
   $.ajax({
     type: "GET",
@@ -44,7 +49,7 @@
     success: function(maps) {
       for(var i = 0; i < maps.length; i++) {
         var m = maps[i];
-        var marker = L.marker([m.latitude, m.longitude]).addTo(map);
+        var marker = L.marker([m.latitude, m.longitude], {icon:redIcon}).addTo(map);
         marker.bindPopup("<b>朝日新聞</b><br>契約済<br>契約数：2000<br>営業コメント：大口のお客様です！");
       }
     }
