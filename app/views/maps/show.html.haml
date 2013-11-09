@@ -1,31 +1,27 @@
 %p#notice= notice
 
 %p
-  %b Title:
-  = @map.title
+  %b Company name:
+  = @map.company_name
+%p
+  %b Company address:
+  = @map.company_address
 %p
   %b Latitude:
   = @map.latitude
 %p
   %b Longitude:
   = @map.longitude
+%p
+  %b Contract num:
+  = @map.contract_num
+%p
+  %b Comment:
+  = @map.comment
+%p
+  %b Customer type:
+  = @map.customer_type
 
 = link_to 'Edit', edit_map_path(@map)
 \|
 = link_to 'Back', maps_path
-
-%div#map
-:css
-  #map { height: 700px; }
-:javascript
-  L.Icon.Default.imagePath = "/assets";
-  var lat = #{@map.latitude}
-  var lng = #{@map.longitude}
-  var map = L.map('map').setView([lat, lng], 17);
-  var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-  var osmAttrib = "Map data © OpenStreetMap contributors";
-  L.tileLayer(osmUrl, {
-    attribution: osmAttrib,
-    maxZoom: 20,
-  }).addTo(map);
-  var marker = L.marker([lat, lng]).addTo(map);

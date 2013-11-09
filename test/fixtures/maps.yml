@@ -1,11 +1,19 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  title: MyString
+  company_name: MyString
+  company_address: MyString
   latitude: 1.5
   longitude: 1.5
+  contract_num: 1
+  comment: MyString
+  customer_type: 1
 
 two:
-  title: MyString
+  company_name: MyString
+  company_address: MyString
   latitude: 1.5
   longitude: 1.5
+  contract_num: 1
+  comment: MyString
+  customer_type: 1

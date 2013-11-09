@@ -7,34 +7,25 @@
           %li= msg
 
   .field
-    = f.label :title
-    = f.text_field :title
+    = f.label :company_name
+    = f.text_field :company_name
+  .field
+    = f.label :company_address
+    = f.text_field :company_address
   .field
     = f.label :latitude
     = f.text_field :latitude
   .field
     = f.label :longitude
     = f.text_field :longitude
+  .field
+    = f.label :contract_num
+    = f.number_field :contract_num
+  .field
+    = f.label :comment
+    = f.text_field :comment
+  .field
+    = f.label :customer_type
+    = f.number_field :customer_type
   .actions
     = f.submit 'Save'
-
-%div#map
-:css
-  #map { height: 700px; }
-:javascript
-  L.Icon.Default.imagePath = "/assets";
-  var lat = $("#map_latitude").val()? $("#map_latitude").val() : 35.64483;
-  var lng = $("#map_longitude").val()? $("#map_longitude").val() : 139.40881;
-  var map = L.map('map').setView([35.64483, 139.40881], 17);
-  var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-  var osmAttrib = "Map data © OpenStreetMap contributors";
-  L.tileLayer(osmUrl, {
-    attribution: osmAttrib,
-    maxZoom: 20,
-  }).addTo(map);
-  var marker = L.marker([lat, lng]).addTo(map);
-  map.on("click", function(e) {
-    marker.setLatLng(e.latlng);
-    $("#map_latitude").val(e.latlng.lat);
-    $("#map_longitude").val(e.latlng.lng);
-  });

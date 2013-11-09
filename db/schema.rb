@@ -11,14 +11,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130821043320) do
+ActiveRecord::Schema.define(:version => 20131108141540) do
 
   create_table "maps", :force => true do |t|
-    t.string   "title"
+    t.string   "company_name"
+    t.string   "company_address"
     t.float    "latitude"
     t.float    "longitude"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.integer  "contract_num"
+    t.string   "comment"
+    t.integer  "customer_type"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
 end

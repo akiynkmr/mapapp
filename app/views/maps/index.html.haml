@@ -1,46 +1,135 @@
+!!!
 %div#map
 %div#search
-  %input{:type=>"text", :name => "addr", :placeholder => "住所、地名を入力してください", :id => "addr", :size => 10}
-  %button{:onclick => 'addr_search()'}検索
+  %input.css3input{:focus => 'change_css()', :type=>"text", :name => "addr", :placeholder => "住所、地名を入力してください", :id => "addr", :size => 10}
+  %button.css3button{:onclick => 'addr_search()'}検索
+  -#　.css3inputと.css3buttonはショートカット。{:class => "css3input"}と同意。
 
 :css
-  #map { height: 700px; }
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  html, body, #map {
+    height: 100%;
+  }
+  
   #search {
-  background-color: white;
+  background-color:transparent;
   position: absolute;
   bottom: 40px;
-  left: 40px;
+  left: 400px;
   width: auto;
   height: auto;
   padding: 10px;
   }
-  #search input {
-  width: 200px;
+
+  .css3input {
+    border:0;
+    padding: 10px;
+    font-size:1.2em;
+    font-family:Arial, sans-serif;
+    color:black;
+    border:solid 1px #ccc;
+    margin:0 0 20px;
+    width:300px;
+    -moz-box-shadow: inset 1px 4px 9px -6px rgba(0,0,0,0.5);
+    -webkit-box-shadow: inset 1px 4px 9px -6px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 1px 4px 9px -6px rgba(0,0,0,0.5);
   }
   
+  .css3button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #ffffff;
+  padding: 10px 20px;
+  background: -moz-linear-gradient(
+    top,
+    #dbe1ff 0%,
+    #21c4ff 25%,
+    #3300ff);
+    background: -webkit-gradient(
+    linear, left top, left bottom, 
+    from(#dbe1ff),
+    color-stop(0.25, #21c4ff),
+    to(#3300ff));
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    border: 1px solid #4000b8;
+    -moz-box-shadow:
+    0px 1px 3px rgba(0,0,0,0.5),
+    inset 0px -1px 0px rgba(255,255,255,0.7);
+    -webkit-box-shadow:
+    0px 1px 3px rgba(0,0,0,0.5),
+    inset 0px -1px 0px rgba(255,255,255,0.7);
+    box-shadow:
+    0px 1px 3px rgba(0,0,0,0.5),
+    inset 0px -1px 0px rgba(255,255,255,0.7);
+    text-shadow:
+    0px -1px 1px rgba(000,000,000,0.2),
+    0px 1px 0px rgba(255,255,255,0.3);
+    }
+  
 :javascript
+  
   function addr_search() {
     var inp = document.getElementById("addr");
     alert('検索実行');
   }
+  
+  function change_css(){
+    alert('hoge')
+  }
+  
   L.Icon.Default.imagePath = "/assets";
   var lat = 35.65991663135068;
   var lng = 139.76471178097805;
-  var map = L.map('map').setView([lat, lng], 15);
+  var map = L.map('map').setView([lat, lng], 14);
   var osmUrl = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   var osmAttrib = "Map data © OpenStreetMap contributors";
   var redIcon = L.icon({
-    iconUrl: '/assets/leaf-red.png',
+    iconUrl: '/assets/sumi.gif',
     shadowUrl: '/assets/leaf-shadow.png',
-    iconSize:     [38, 95],
+    iconSize:     [30, 30],
     shadowSize:   [50, 64]
   });
+  var blackIcon = L.icon({
+    iconUrl: '/assets/black-icon.png',
+    iconSize:     [30, 30],
+  });
+  
   L.tileLayer(osmUrl, {
     attribution: osmAttrib,
     maxZoom: 18
   }).addTo(map);
   
   L.circle([lat, lng], 500).addTo(map);
+  
+  function addr_search() {
+    var inp = document.getElementById("addr");
+
+    $.getJSON('http://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + inp.value, function(data) {
+        var items = [];
+
+        $.each(data, function(key, val) {
+            bb = val.boundingbox;
+            items.push("<li><a href='#' onclick='chooseAddr(" + bb[0] + ", " + bb[2] + ", " + bb[1] + ", " + bb[3]  + ", \"" + val.osm_type + "\");return false;'>" + val.display_name + '</a></li>');
+        });
+
+    $('#results').empty();
+        if (items.length != 0) {
+            $('<p>', { html: "Search results:" }).appendTo('#results');
+            $('<ul/>', {
+                'class': 'my-new-list',
+                html: items.join('')
+            }).appendTo('#results');
+        } else {
+            $('<p>', { html: "No results found" }).appendTo('#results');
+        }
+    });
+  }
+  
   
   $.ajax({
     type: "GET",
@@ -49,8 +138,24 @@
     success: function(maps) {
       for(var i = 0; i < maps.length; i++) {
         var m = maps[i];
-        var marker = L.marker([m.latitude, m.longitude], {icon:redIcon}).addTo(map);
-        marker.bindPopup("<b>朝日新聞</b><br>契約済<br>契約数：2000<br>営業コメント：大口のお客様です！");
+        var type = m.customer_type;
+        
+        if(type == 1){
+          var marker = L.marker([m.latitude, m.longitude], {icon:redIcon}).addTo(map);
+          var cstmr_type = "既存契約";
+        }else if(type == 2){
+          var marker = L.marker([m.latitude, m.longitude], {icon:blackIcon}).addTo(map);
+          var cstmr_type = "ブラック";
+        }
+        var com = m.company_name;
+        var addr = m.company_address;
+        var cnt = m.contract_num;
+        var type = m.customer_type;
+        var service = "おとくライン";
+
+        marker.bindPopup("会社名：" + com + '<br />' + "住所：" + addr + 
+        '<br />' + "契約商品：" + service　+ '<br />' + "契約数：" + cnt +'<br />' + "お客様タイプ：" + cstmr_type);
+        console.log(m);
       }
     }
   });
